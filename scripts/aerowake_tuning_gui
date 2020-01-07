@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+
+import sys
+
+from aerowake_tuning_gui.plugin import AerowakeTuningPlugin
+from rqt_gui.main import Main
+
+plugin = 'aerowake_tuning_gui'
+main = Main(filename=plugin)
+sys.exit(main.main(standalone=plugin))
