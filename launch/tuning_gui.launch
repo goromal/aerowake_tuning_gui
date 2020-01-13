@@ -1,0 +1,6 @@
+<launch>
+
+<node name="tuning_gui" pkg="rqt_gui" type="rqt_gui" output="screen"
+      args="--perspective-file $(find aerowake_tuning_gui)/perspectives/aerowake_tuning.perspective"/>
+
+</launch>

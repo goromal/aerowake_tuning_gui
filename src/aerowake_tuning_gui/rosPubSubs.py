@@ -9,6 +9,7 @@ class CommandPubSub():
     rc_com_pub = None
     timer = None
     mode = 'ROSflight'
+    command = None
     F = 0.0
     x = 0.0
     y = 0.0
@@ -17,6 +18,7 @@ class CommandPubSub():
     @staticmethod
     def initialize():
         # CommandPubSub.status_sub = rospy.Subscriber('status', Status, CommandPubSub.status_callback)
+        CommandPubSub.command = Command()
         CommandPubSub.rf_com_pub = rospy.Publisher('command', Command, queue_size=1)
         CommandPubSub.rc_com_pub = rospy.Publisher('high_level_command', Command, queue_size=1)
         CommandPubSub.timer = rospy.Timer(rospy.Duration(1.0/25.0), CommandPubSub.update)
@@ -55,67 +57,49 @@ class CommandPubSub():
 
     @staticmethod
     def update(event):
-        command = Command()
+        # command = Command()
+        CommandPubSub.command.header.stamp = rospy.Time.now()
         if CommandPubSub.armed:
-            command.ignore = 0
+            CommandPubSub.command.ignore = 0
         else:
-            command.ignore = 8
+            CommandPubSub.command.ignore = 8
         if CommandPubSub.mode == 'ROSflight':
-            command.mode = Command.MODE_ROLL_PITCH_YAWRATE_THROTTLE
-            command.F = CommandPubSub.F
-            command.x = pi * CommandPubSub.x / 180.0
-            command.y = pi * CommandPubSub.y / 180.0
-            command.z = pi * CommandPubSub.z / 180.0
-            CommandPubSub.rf_com_pub.publish(command)
+            CommandPubSub.command.mode = Command.MODE_ROLL_PITCH_YAWRATE_THROTTLE
+            CommandPubSub.command.F = CommandPubSub.F
+            CommandPubSub.command.x = pi * CommandPubSub.x / 180.0
+            CommandPubSub.command.y = pi * CommandPubSub.y / 180.0
+            CommandPubSub.command.z = pi * CommandPubSub.z / 180.0
+            CommandPubSub.publishCommand()
+
         elif CommandPubSub.mode == 'Aerowake':
-            command.mode = Command.MODE_PITCH_YVEL_YAW_ALTITUDE
-            command.F = CommandPubSub.F
-            command.x = pi * CommandPubSub.x / 180.0
-            command.y = CommandPubSub.y
-            command.z = pi * CommandPubSub.z / 180.0
-            CommandPubSub.rc_com_pub.publish(command)
+            CommandPubSub.command.mode = Command.MODE_PITCH_YVEL_YAW_ALTITUDE
+            CommandPubSub.command.F = CommandPubSub.F
+            CommandPubSub.command.x = pi * CommandPubSub.x / 180.0
+            CommandPubSub.command.y = CommandPubSub.y
+            CommandPubSub.command.z = pi * CommandPubSub.z / 180.0
+            CommandPubSub.publishHighLevelCommand()
+
         elif CommandPubSub.mode == 'ROScopterPOS':
-            command.mode = Command.MODE_XPOS_YPOS_YAW_ALTITUDE
-            command.F = CommandPubSub.F
-            command.x = CommandPubSub.x
-            command.y = CommandPubSub.y
-            command.z = pi * CommandPubSub.z / 180.0
-            CommandPubSub.rc_com_pub.publish(command)
+            CommandPubSub.command.mode = Command.MODE_XPOS_YPOS_YAW_ALTITUDE
+            CommandPubSub.command.F = CommandPubSub.F
+            CommandPubSub.command.x = CommandPubSub.x
+            CommandPubSub.command.y = CommandPubSub.y
+            CommandPubSub.command.z = pi * CommandPubSub.z / 180.0
+            CommandPubSub.publishHighLevelCommand()
+
         elif CommandPubSub.mode == 'ROScopterVEL':
-            command.mode = Command.MODE_XVEL_YVEL_YAWRATE_ALTITUDE
-            command.F = CommandPubSub.F
-            command.x = CommandPubSub.x
-            command.y = CommandPubSub.y
-            command.z = pi * CommandPubSub.z / 180.0
-            CommandPubSub.rc_com_pub.publish(command)
-        # if CommandPubSub.armed:
-        #     command = Command()
-        #     command.ignore = 0
-        #     if CommandPubSub.mode == 'ROSflight':
-        #         command.mode = Command.MODE_ROLL_PITCH_YAWRATE_THROTTLE
-        #         command.F = CommandPubSub.F
-        #         command.x = pi * CommandPubSub.x / 180.0
-        #         command.y = pi * CommandPubSub.y / 180.0
-        #         command.z = pi * CommandPubSub.z / 180.0
-        #         CommandPubSub.rf_com_pub.publish(command)
-        #     elif CommandPubSub.mode == 'Aerowake':
-        #         command.mode = Command.MODE_PITCH_YVEL_YAW_ALTITUDE
-        #         command.F = CommandPubSub.F
-        #         command.x = pi * CommandPubSub.x / 180.0
-        #         command.y = CommandPubSub.y
-        #         command.z = pi * CommandPubSub.z / 180.0
-        #         CommandPubSub.rc_com_pub.publish(command)
-        #     elif CommandPubSub.mode == 'ROScopterPOS':
-        #         command.mode = Command.MODE_XPOS_YPOS_YAW_ALTITUDE
-        #         command.F = CommandPubSub.F
-        #         command.x = CommandPubSub.x
-        #         command.y = CommandPubSub.y
-        #         command.z = pi * CommandPubSub.z / 180.0
-        #         CommandPubSub.rc_com_pub.publish(command)
-        #     elif CommandPubSub.mode == 'ROScopterVEL':
-        #         command.mode = Command.MODE_XVEL_YVEL_YAWRATE_ALTITUDE
-        #         command.F = CommandPubSub.F
-        #         command.x = CommandPubSub.x
-        #         command.y = CommandPubSub.y
-        #         command.z = pi * CommandPubSub.z / 180.0
-        #         CommandPubSub.rc_com_pub.publish(command)
+            CommandPubSub.command.mode = Command.MODE_XVEL_YVEL_YAWRATE_ALTITUDE
+            CommandPubSub.command.F = CommandPubSub.F
+            CommandPubSub.command.x = CommandPubSub.x
+            CommandPubSub.command.y = CommandPubSub.y
+            CommandPubSub.command.z = pi * CommandPubSub.z / 180.0
+            CommandPubSub.publishHighLevelCommand()
+
+    @staticmethod
+    def publishCommand():
+        # print 'GUI publish COMMAND'
+        CommandPubSub.rf_com_pub.publish(CommandPubSub.command)
+
+    @staticmethod
+    def publishHighLevelCommand():
+        CommandPubSub.rc_com_pub.publish(CommandPubSub.command)
