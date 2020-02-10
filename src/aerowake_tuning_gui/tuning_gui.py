@@ -56,13 +56,13 @@ keymap = {'ROSflight':   [0,                            # menu index
                           'deg'],                       # z_unit
           'ROScopterPOS':[2,                            # menu index
                           'Altitude (m)',               # F_title
-                          5.0,                          # F_max
+                          15.0, # 5.0,                          # F_max
                           0.0,                          # F_min
                           0.05,                         # F_inc
                           'm',                          # F_unit
                           'X-Position (m)',             # x_title
-                          5,                            # x_max
-                          -5,                           # x_min
+                          30,                            # x_max
+                          -30,                           # x_min
                           0.05,                         # x_inc
                           'm',                          # x_unit
                           'Y-Position (m)',             # y_title
